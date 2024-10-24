@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tomat_in/beranda.dart';
+import 'package:tomat_in/riwayat.dart';
 
 class NavigationBarApp1 extends StatelessWidget {
   const NavigationBarApp1({super.key});
@@ -8,6 +10,7 @@ class NavigationBarApp1 extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(useMaterial3: true),
       home: const MyWidget(),
+      debugShowCheckedModeBanner: false, // Menonaktifkan tulisan debug
     );
   }
 }
@@ -21,10 +24,10 @@ class MyWidget extends StatefulWidget {
 
 class _MyWidgetState extends State<MyWidget> {
   final List<Widget> _pages = [
-    const Center(child: Text('Halaman Beranda')),
-    const Center(child: Text('Halaman Riwayat')),
-    const Center(child: Text('Halaman Kunjungan')),
-    const Center(child: Text('Halaman Akun')),
+    const beranda(),
+    const RiwayatScreen(),
+    // const Center(child: Text('Halaman Kunjungan')),
+    // const Center(child: Text('Halaman Akun')),
   ];
   int _selectedIndex = 0;
 
@@ -35,7 +38,7 @@ class _MyWidgetState extends State<MyWidget> {
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white, // Warna latar belakang navbar
         currentIndex: _selectedIndex,
-        selectedItemColor: Color(0xFF21690F), // Warna item yang dipilih (hijau)
+        selectedItemColor: Color(0xFFB71C1C), // Warna item yang dipilih (hijau)
         unselectedItemColor: Colors.black, // Warna item yang tidak dipilih (putih)
         items: const [
           BottomNavigationBarItem(
