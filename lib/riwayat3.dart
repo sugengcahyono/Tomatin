@@ -26,7 +26,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     if (response["status"]) {
       // Assuming response["data"] is a List
       setState(() {
-        riwayatDatatotal = response["data"]; // Set data directly
+        riwayatData = response["data"]; // Set data directly
       });
     } else {
       // Handle errors
@@ -34,7 +34,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
         SnackBar(content: Text(response["message"] ?? "Error fetching data")),
       );
     }
-}
+  }
 
   // untuk list card
   Future<void> _fetchData() async {
@@ -313,17 +313,17 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
       children: [
         _buildCategoryCard_berat(
             'Matang',
-            '${(totalWeights["Matang"] ?? 0).toStringAsFixed(3)} kg',
+            '${(totalWeights["Matang"] ?? 0).toStringAsFixed(5)} kg',
             Colors.red,
             Colors.black),
         _buildCategoryCard_berat(
             'Setengah Matang',
-            '${(totalWeights["Setengah Matang"] ?? 0).toStringAsFixed(3)} kg',
+            '${(totalWeights["Setengah Matang"] ?? 0).toStringAsFixed(5)} kg',
             Colors.orange,
             Colors.black),
         _buildCategoryCard_berat(
             'Mentah',
-            '${(totalWeights["Mentah"] ?? 0).toStringAsFixed(3)} kg',
+            '${(totalWeights["Mentah"] ?? 0).toStringAsFixed(5)} kg',
             Colors.green,
             Colors.black),
       ],
@@ -347,7 +347,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DetailRiwayatScreen(Tanggal: tanggalSortir, Kloter: kloter),
+            builder: (context) => DetailRiwayatScreen(id: kloter),
           ),
         );
       },
@@ -400,7 +400,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
 
   Widget _buildCategoryCard(String label, double weight, Color color) {
     return Container(
-      width: 90, // Adjust width as needed
+      width: 100, // Adjust width as needed
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         border: Border.all(color: color, width: 2),
@@ -416,8 +416,8 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            "${weight.toStringAsFixed(3)} Kg",
-            style: const TextStyle(fontSize: 12),
+            "${weight.toStringAsFixed(1)} Kg",
+            style: const TextStyle(fontSize: 16),
             textAlign: TextAlign.center,
           ),
         ],

@@ -24,8 +24,8 @@ class MyWidget extends StatefulWidget {
 
 class _MyWidgetState extends State<MyWidget> {
   final List<Widget> _pages = [
-    const beranda(),
-    const RiwayatScreen(),
+     beranda(),
+     RiwayatScreen(),
     // const Center(child: Text('Halaman Kunjungan')),
     // const Center(child: Text('Halaman Akun')),
   ];

@@ -1,10 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // Untuk menampilkan tanggal format lokal
-import 'package:fl_chart/fl_chart.dart'; // Pastikan untuk mengimpor fl_chart
+// import 'package:fl_chart/fl_chart.dart'; // Pastikan untuk mengimpor fl_chart
+import 'api_service.dart';
 
-class beranda extends StatelessWidget {
+class beranda extends StatefulWidget {
   // Use PascalCase for class names
-  const beranda({Key? key}) : super(key: key);
+  beranda({Key? key}) : super(key: key);
+
+  @override
+  State<beranda> createState() => _berandaState();
+}
+
+class _berandaState extends State<beranda> {
+  final ApiService apiService = ApiService();
+  late Stream<Map<String, dynamic>> berat_bulan;
+  late Stream<Map<String, dynamic>> berat_kemarin;
+  // late Future<Map<String, dynamic>> berat_hariini;
+  late Stream<Map<String, dynamic>> berat_hariini;
+
+  @override
+  void initState() {
+    super.initState();
+    berat_bulan = apiService.getBeratTomatBulanIni(); // bulan
+    berat_kemarin = apiService.getBeratTomatKemarin(); // kemarin
+    berat_hariini = apiService.getBeratTomatHariIni(); // hari ini
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +93,7 @@ class beranda extends StatelessWidget {
                           children: [
                             TextSpan(
                               text:
-                                  'Dapatkan solusi terbaik untuk memilah kualitas tomat Anda disini',
+                                  'Dapatkan solusi terbaik untuk memilah kematangan tomat Anda disini',
                               style:
                                   TextStyle(fontSize: 16, color: Colors.white),
                             ),
@@ -322,8 +342,6 @@ class beranda extends StatelessWidget {
                   ),
                 ),
 
-                
-
                 Padding(
                   padding: const EdgeInsets.only(left: 10),
                   child: Column(
@@ -373,170 +391,81 @@ class beranda extends StatelessWidget {
                     ),
                   ),
                 ),
+                StreamBuilder<Map<String, dynamic>>(
+                  stream: berat_hariini, // The stream for today’s weight
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text("Error: ${snapshot.error}"));
+                    } else if (snapshot.hasData) {
+                      // Extracting data for display
+                      var data = snapshot.data!;
+                      var beratData = data["berat_tomat_harian"] as List;
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      height: 150,
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.symmetric(vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      var beratMatang_bulan = beratData.firstWhere(
+                        (element) => element["nama_kategori"] == "Matang",
+                        orElse: () => {"total_berat": "0.000"},
+                      )["total_berat"];
+
+                      var beratSetengahMatang_bulan = beratData.firstWhere(
+                        (element) =>
+                            element["nama_kategori"] == "Setengah Matang",
+                        orElse: () => {"total_berat": "0.000"},
+                      )["total_berat"];
+
+                      var beratMentah_bulan = beratData.firstWhere(
+                        (element) => element["nama_kategori"] == "Mentah",
+                        orElse: () => {"total_berat": "0.000"},
+                      )["total_berat"];
+
+                      return Column(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.red
-                                  .withOpacity(0.2), // Warna latar belakang
-                              border: Border.all(
-                                  color: Colors.red, width: 2), // Border merah
-                              borderRadius: BorderRadius.circular(
-                                  5), // Sudut border melengkung
-                            ),
-                            child: const Text(
-                              'Matang',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black, // Warna teks
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 23),
-                          const Text(
-                            '0,020',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          const Text(
-                            'Kg',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                          const SizedBox(height: 1),
+                          Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                // Ripe
+                                buildWeightCard(
+                                  'Matang',
+                                  beratMatang_bulan.toString(),
+                                  Colors.red,
+                                  titleWeightSpacing:
+                                      25, // Custom spacing for this card
+                                  weightKgSpacing:
+                                      8, // Custom spacing for this card
+                                ),
+                                // Semi-Ripe
+                                buildWeightCard(
+                                  'Setengah Matang',
+                                  beratSetengahMatang_bulan.toString(),
+                                  Colors.orange,
+                                  titleWeightSpacing:
+                                      5, // Custom spacing for this card
+                                  weightKgSpacing:
+                                      10, // Custom spacing for this card
+                                ),
+                                // Unripe
+                                buildWeightCard(
+                                  'Mentah',
+                                  beratMentah_bulan.toString(),
+                                  Colors.green,
+                                  titleWeightSpacing:
+                                      25, // Custom spacing for this card
+                                  weightKgSpacing:
+                                      12, // Custom spacing for this card
+                                ),
+                              ],
                             ),
                           ),
                         ],
-                      ),
-                    ),
+                      );
+                    }
 
-                    // Belum Matang
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      height: 150,
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.symmetric(vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.orange
-                                  .withOpacity(0.2), // Warna latar belakang
-                              border: Border.all(
-                                  color: Colors.orange,
-                                  width: 2), // Border merah
-                              borderRadius: BorderRadius.circular(
-                                  5), // Sudut border melengkung
-                            ),
-                            child: const Text(
-                              'Setengah Matang',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black, // Warna teks
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          const Text(
-                            '0,020',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          const Text(
-                            'Kg',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Busuk
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      height: 150,
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.green
-                                  .withOpacity(0.2), // Warna latar belakang
-                              border: Border.all(
-                                  color: Colors.green,
-                                  width: 2), // Border merah
-                              borderRadius: BorderRadius.circular(
-                                  5), // Sudut border melengkung
-                            ),
-                            child: const Text(
-                              'Mentah',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black, // Warna teks
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 23),
-                          const Text(
-                            '0,020',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          const Text(
-                            'Kg',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
+                    return Container(); // Return an empty container if none of the above conditions match
+                  },
                 ),
 
                 // Dua Card di bawah
@@ -574,169 +503,81 @@ class beranda extends StatelessWidget {
                   ),
                 ),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      height: 150,
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.symmetric(vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.red
-                                  .withOpacity(0.2), // Warna latar belakang
-                              border: Border.all(
-                                  color: Colors.red, width: 2), // Border merah
-                              borderRadius: BorderRadius.circular(
-                                  5), // Sudut border melengkung
-                            ),
-                            child: const Text(
-                              'Matang',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black, // Warna teks
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 23),
-                          const Text(
-                            '0,020',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          const Text(
-                            'Kg',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                StreamBuilder<Map<String, dynamic>>(
+                  stream: berat_kemarin, // The stream for today’s weight
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text("Error: ${snapshot.error}"));
+                    } else if (snapshot.hasData) {
+                      // Extracting data for display
+                      var data = snapshot.data!;
+                      var beratData = data["berat_tomat_kemarin"] as List;
 
-                    // Belum Matang
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      height: 150,
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.symmetric(vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.orange
-                                  .withOpacity(0.2), // Warna latar belakang
-                              border: Border.all(
-                                  color: Colors.orange,
-                                  width: 2), // Border merah
-                              borderRadius: BorderRadius.circular(
-                                  5), // Sudut border melengkung
-                            ),
-                            child: const Text(
-                              'Setengah Matang',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black, // Warna teks
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          const Text(
-                            '0,020',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          const Text(
-                            'Kg',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                      var beratMatang_bulan = beratData.firstWhere(
+                        (element) => element["nama_kategori"] == "Matang",
+                        orElse: () => {"total_berat": "0.000"},
+                      )["total_berat"];
 
-                    // Busuk
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      height: 150,
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      var beratSetengahMatang_bulan = beratData.firstWhere(
+                        (element) =>
+                            element["nama_kategori"] == "Setengah Matang",
+                        orElse: () => {"total_berat": "0.000"},
+                      )["total_berat"];
+
+                      var beratMentah_bulan = beratData.firstWhere(
+                        (element) => element["nama_kategori"] == "Mentah",
+                        orElse: () => {"total_berat": "0.000"},
+                      )["total_berat"];
+
+                      return Column(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.green
-                                  .withOpacity(0.2), // Warna latar belakang
-                              border: Border.all(
-                                  color: Colors.green,
-                                  width: 2), // Border merah
-                              borderRadius: BorderRadius.circular(
-                                  5), // Sudut border melengkung
-                            ),
-                            child: const Text(
-                              'Mentah',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black, // Warna teks
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 23),
-                          const Text(
-                            '0,020',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          const Text(
-                            'Kg',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                          const SizedBox(height: 1),
+                          Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                // Ripe
+                                buildWeightCard(
+                                  'Matang',
+                                  beratMatang_bulan.toString(),
+                                  Colors.red,
+                                  titleWeightSpacing:
+                                      25, // Custom spacing for this card
+                                  weightKgSpacing:
+                                      8, // Custom spacing for this card
+                                ),
+                                // Semi-Ripe
+                                buildWeightCard(
+                                  'Setengah Matang',
+                                  beratSetengahMatang_bulan.toString(),
+                                  Colors.orange,
+                                  titleWeightSpacing:
+                                      5, // Custom spacing for this card
+                                  weightKgSpacing:
+                                      10, // Custom spacing for this card
+                                ),
+                                // Unripe
+                                buildWeightCard(
+                                  'Mentah',
+                                  beratMentah_bulan.toString(),
+                                  Colors.green,
+                                  titleWeightSpacing:
+                                      25, // Custom spacing for this card
+                                  weightKgSpacing:
+                                      12, // Custom spacing for this card
+                                ),
+                              ],
                             ),
                           ),
                         ],
-                      ),
-                    )
-                  ],
+                      );
+                    }
+
+                    return Container(); // Return an empty container if none of the above conditions match
+                  },
                 ),
 
                 const SizedBox(height: 5),
@@ -773,174 +614,147 @@ class beranda extends StatelessWidget {
                   ),
                 ),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      height: 150,
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.symmetric(vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.red
-                                  .withOpacity(0.2), // Warna latar belakang
-                              border: Border.all(
-                                  color: Colors.red, width: 2), // Border merah
-                              borderRadius: BorderRadius.circular(
-                                  5), // Sudut border melengkung
-                            ),
-                            child: const Text(
-                              'Matang',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black, // Warna teks
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 23),
-                          const Text(
-                            '0,020',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          const Text(
-                            'Kg',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                StreamBuilder<Map<String, dynamic>>(
+                  stream: berat_bulan, // The stream for today’s weight
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text("Error: ${snapshot.error}"));
+                    } else if (snapshot.hasData) {
+                      // Extracting data for display
+                      var data = snapshot.data!;
+                      var beratData = data["berat_tomat_bulan_ini"] as List;
 
-                    // Belum Matang
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      height: 150,
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.symmetric(vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.orange
-                                  .withOpacity(0.2), // Warna latar belakang
-                              border: Border.all(
-                                  color: Colors.orange,
-                                  width: 2), // Border merah
-                              borderRadius: BorderRadius.circular(
-                                  5), // Sudut border melengkung
-                            ),
-                            child: const Text(
-                              'Setengah Matang',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black, // Warna teks
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          const Text(
-                            '0,020',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          const Text(
-                            'Kg',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                      var beratMatang_bulan = beratData.firstWhere(
+                        (element) => element["nama_kategori"] == "Matang",
+                        orElse: () => {"total_berat": "0.000"},
+                      )["total_berat"];
 
-                    // Busuk
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      height: 150,
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      var beratSetengahMatang_bulan = beratData.firstWhere(
+                        (element) =>
+                            element["nama_kategori"] == "Setengah Matang",
+                        orElse: () => {"total_berat": "0.000"},
+                      )["total_berat"];
+
+                      var beratMentah_bulan = beratData.firstWhere(
+                        (element) => element["nama_kategori"] == "Mentah",
+                        orElse: () => {"total_berat": "0.000"},
+                      )["total_berat"];
+
+                      return Column(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.green
-                                  .withOpacity(0.2), // Warna latar belakang
-                              border: Border.all(
-                                  color: Colors.green,
-                                  width: 2), // Border merah
-                              borderRadius: BorderRadius.circular(
-                                  5), // Sudut border melengkung
-                            ),
-                            child: const Text(
-                              'Mentah',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black, // Warna teks
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 23),
-                          const Text(
-                            '0,020',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          const Text(
-                            'Kg',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                          const SizedBox(height: 1),
+                          Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                // Ripe
+                                buildWeightCard(
+                                  'Matang',
+                                  beratMatang_bulan.toString(),
+                                  Colors.red,
+                                  titleWeightSpacing:
+                                      25, // Custom spacing for this card
+                                  weightKgSpacing:
+                                      8, // Custom spacing for this card
+                                ),
+                                // Semi-Ripe
+                                buildWeightCard(
+                                  'Setengah Matang',
+                                  beratSetengahMatang_bulan.toString(),
+                                  Colors.orange,
+                                  titleWeightSpacing:
+                                      5, // Custom spacing for this card
+                                  weightKgSpacing:
+                                      10, // Custom spacing for this card
+                                ),
+                                // Unripe
+                                buildWeightCard(
+                                  'Mentah',
+                                  beratMentah_bulan.toString(),
+                                  Colors.green,
+                                  titleWeightSpacing:
+                                      25, // Custom spacing for this card
+                                  weightKgSpacing:
+                                      12, // Custom spacing for this card
+                                ),
+                              ],
                             ),
                           ),
                         ],
-                      ),
-                    )
-                  ],
+                      );
+                    }
+
+                    return Container(); // Return an empty container if none of the above conditions match
+                  },
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget buildWeightCard(String title, String weight, Color color,
+      {double titleWeightSpacing = 10, double weightKgSpacing = 10}) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.3,
+      height: 150,
+      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.symmetric(),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.2),
+              border: Border.all(color: color, width: 2),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ),
+
+          SizedBox(
+              height:
+                  titleWeightSpacing), // Custom spacing between title and weight
+
+          Text(
+            weight,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+            overflow: TextOverflow.visible,
+            maxLines: 1,
+          ),
+
+          SizedBox(
+              height:
+                  weightKgSpacing), // Custom spacing between weight and 'Kg' text
+
+          const Text(
+            'Kg',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
