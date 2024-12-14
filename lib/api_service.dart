@@ -2,9 +2,102 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 // Ganti baseUrl dengan URL server API Anda
-const String baseUrl = "http://192.168.0.101/tomatin_server/tomatin_api";
+const String baseUrl = "http://192.168.140.156/tomatin_server/tomatin_api";
 
 class ApiService {
+
+// GET REALTIME BERAT
+  Stream<Map<String, dynamic>> getBeratTomatRealTime() async* {
+    final String url = "$baseUrl/get_realtime_berat.php";
+    
+    while (true) { // Infinite loop to keep the Stream open for real-time updates
+      try {
+        // Send GET request to fetch the data
+        final response = await http.get(Uri.parse(url));
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body) as Map<String, dynamic>;
+
+          if (data["status"] == "success") {
+            yield data; // Emit the data if response is successful
+          } else {
+            // Return default zero values if the status is not "success"
+            yield {
+              "status": "success",
+              "berat_tomat_harian": [
+                {"nama_kategori": "Matang", "total_berat": "0.000"},
+                {"nama_kategori": "Setengah Matang", "total_berat": "0.000"},
+                {"nama_kategori": "Mentah", "total_berat": "0.000"},
+              ]
+            };
+          }
+        } else {
+          // Handle response failure and return default values
+          yield {
+            "status": "success",
+            "berat_tomat_harian": [
+              {"nama_kategori": "Matang", "total_berat": "0.000"},
+              {"nama_kategori": "Setengah Matang", "total_berat": "0.000"},
+              {"nama_kategori": "Mentah", "total_berat": "0.000"},
+            ]
+          };
+        }
+      } catch (e) {
+        // Handle any errors (network, parsing, etc.) and return default zero values
+        yield {
+          "status": "success",
+          "berat_tomat_harian": [
+            {"nama_kategori": "Matang", "total_berat": "0.000"},
+            {"nama_kategori": "Setengah Matang", "total_berat": "0.000"},
+            {"nama_kategori": "Mentah", "total_berat": "0.000"},
+          ]
+        };
+      }
+      
+      // Delay before fetching the data again (every 2 seconds in this case)
+      await Future.delayed(Duration(seconds: 2));
+    }
+  }
+
+  // RESET KLOTER
+  Future<Map<String, dynamic>> getLatestKloter() async {
+  final String url = "$baseUrl/reset_button.php"; // Sesuaikan endpoint
+
+  try {
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body) as Map<String, dynamic>;
+
+      if (data["status"] == "success") {
+        return data; // Kembalikan data terbaru
+      } else {
+        // Kembalikan default jika status bukan success
+        return {
+          "status": "error",
+          "message": "Kloter sebelumnya kosong.",
+          "kloter": 0 // Default kloter jika gagal
+        };
+      }
+    } else {
+      // Kembalikan default jika response gagal
+      return {
+        "status": "error",
+        "message": "Gagal mendapatkan data. Kode Status: ${response.statusCode}",
+        "kloter": 0
+      };
+    }
+  } catch (e) {
+    // Tangani error lain dengan mengembalikan nilai default
+    return {
+      "status": "error",
+      "message": "Terjadi kesalahan: $e",
+      "kloter": 0
+    };
+  }
+}
+
+
   // GET TOMAT BULAN
 Stream<Map<String, dynamic>> getBeratTomatBulanIni() async* {
   final String url = "$baseUrl/get_datatomat_bulan.php";

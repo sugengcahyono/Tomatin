@@ -190,14 +190,14 @@ class _DetailRiwayatScreenState extends State<DetailRiwayatScreen> {
                                 ),
                               ),
                               Text(
-                               'Berat Tomat: ${_riwayatData != null && _riwayatData!['Matang'] != null ? (_riwayatData!['Matang']['total_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : '0.000'}',
+                               'Berat Tomat: ${_riwayatData != null && _riwayatData!['Matang'] != null ? (_riwayatData!['Matang']['total_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : '0.000'} gr',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.normal,
                                 ),
                               ),
                               Text(
-                                'Rata Rata Berat: ${_riwayatData != null && _riwayatData!['Matang'] != null ? (_riwayatData!['Matang']['rata_rata_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : '0.000'}',
+                                'Rata Rata Berat: ${_riwayatData != null && _riwayatData!['Matang'] != null ? (_riwayatData!['Matang']['rata_rata_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : '0.000'} gr',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.normal,
@@ -286,14 +286,14 @@ class _DetailRiwayatScreenState extends State<DetailRiwayatScreen> {
                                 ),
                               ),
                               Text(
-                                'Berat Tomat: ${_riwayatData != null && _riwayatData!['Setengah Matang'] != null ? (_riwayatData!['Setengah Matang']['total_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : '0.000'}',
+                                'Berat Tomat: ${_riwayatData != null && _riwayatData!['Setengah Matang'] != null ? (_riwayatData!['Setengah Matang']['total_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : '0.000'} gr',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.normal,
                                 ),
                               ),
                               Text(
-                                'Rata Rata Berat: ${_riwayatData != null && _riwayatData!['Setengah Matang'] != null ? (_riwayatData!['Setengah Matang']['rata_rata_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : '0.000'}',
+                                'Rata Rata Berat: ${_riwayatData != null && _riwayatData!['Setengah Matang'] != null ? (_riwayatData!['Setengah Matang']['rata_rata_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : '0.000'} gr',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.normal,
@@ -382,14 +382,14 @@ class _DetailRiwayatScreenState extends State<DetailRiwayatScreen> {
                                 ),
                               ),
                               Text(
-                                'Berat Tomat: ${_riwayatData != null && _riwayatData!['Mentah'] != null ? (_riwayatData!['Mentah']['total_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : '0.000'}',
+                                'Berat Tomat: ${_riwayatData != null && _riwayatData!['Mentah'] != null ? (_riwayatData!['Mentah']['total_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : '0.000'} gr',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.normal,
                                 ),
                               ),
                               Text(
-                                'Rata Rata Berat: ${_riwayatData != null && _riwayatData!['Mentah'] != null ? (_riwayatData!['Mentah']['rata_rata_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : '0.000'}',
+                                'Rata Rata Berat: ${_riwayatData != null && _riwayatData!['Mentah'] != null ? (_riwayatData!['Mentah']['rata_rata_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : '0.000'} gr',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.normal,
@@ -458,14 +458,14 @@ class _DetailRiwayatScreenState extends State<DetailRiwayatScreen> {
                               ),
                             ),
                             Text(
-                              'Total Berat: ${_riwayatData_keseluruhan != null ? (_riwayatData_keseluruhan!['total_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : 0.0} kg',
+                              'Total Berat: ${_riwayatData_keseluruhan != null ? (_riwayatData_keseluruhan!['total_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : 0.0} gr',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.normal,
                               ),
                             ),
                             Text(
-                              'Rata-rata Berat: ${_riwayatData_keseluruhan != null ? (_riwayatData_keseluruhan!['rata_rata_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : 0.0} kg',
+                              'Rata-rata Berat: ${_riwayatData_keseluruhan != null ? (_riwayatData_keseluruhan!['rata_rata_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : 0.0} gr',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.normal,

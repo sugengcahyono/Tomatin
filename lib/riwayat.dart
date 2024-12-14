@@ -167,6 +167,10 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                       itemCount: riwayatData!.length,
                       itemBuilder: (context, index) {
                         // Reverse the order by accessing the keys in reverse
+                        final tanggalSortirkloter= riwayatData!.keys
+                            .toList()
+                            .reversed
+                            .elementAt(index); 
                         final tanggalSortir = riwayatData!.keys
                             .toList()
                             .reversed
@@ -210,7 +214,9 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                                 totalBeratMatang,
                                 totalBeratMentah,
                                 totalBeratSetengahMatang,
-                                tanggalSortir, // Pass the sorting date
+                                tanggalSortir,
+                                tanggalSortirkloter,
+                                 // Pass the sorting date
                               );
                             }).toList(),
                           ],
@@ -337,10 +343,13 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     double totalBeratMentah,
     double totalBeratSetengahMatang,
     String tanggalSortir,
+    String tanggalSortirkloter,
   ) {
     // Ambil waktu tanggal_sortir dari data riwayat
     final String? tanggalDanWaktuSortir =
-        riwayatData![tanggalSortir]['tanggal_sortir'];
+        riwayatData![tanggalSortir]['kloter'][kloter]['tanggal_sortir_kloter'];
+
+        
 
     return GestureDetector(
       onTap: () {

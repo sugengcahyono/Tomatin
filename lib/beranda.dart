@@ -17,6 +17,7 @@ class _berandaState extends State<beranda> {
   late Stream<Map<String, dynamic>> berat_kemarin;
   // late Future<Map<String, dynamic>> berat_hariini;
   late Stream<Map<String, dynamic>> berat_hariini;
+  late Stream<Map<String, dynamic>> berat_realtime;
 
   @override
   void initState() {
@@ -24,6 +25,60 @@ class _berandaState extends State<beranda> {
     berat_bulan = apiService.getBeratTomatBulanIni(); // bulan
     berat_kemarin = apiService.getBeratTomatKemarin(); // kemarin
     berat_hariini = apiService.getBeratTomatHariIni(); // hari ini
+    berat_realtime = apiService.getBeratTomatRealTime(); // hari ini
+  }
+
+  void _resetKloter(BuildContext context) async {
+    // Tampilkan dialog konfirmasi sebelum reset kloter
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Konfirmasi Reset'),
+        content: const Text('Apakah Anda yakin ingin mereset kloter?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false), // Pilihan batal
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true), // Pilihan lanjut
+            child: const Text('Ya, Reset'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      // Jika pengguna mengonfirmasi, lanjutkan dengan reset kloter
+      ApiService apiService = ApiService();
+
+      final response = await apiService.getLatestKloter();
+
+      if (response['status'] == 'success') {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Reset Berhasil'),
+            content: Text('Kloter baru: ${response['kloter']}'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${response['message']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -138,208 +193,102 @@ class _berandaState extends State<beranda> {
                 const SizedBox(height: 10), // Spasi antara konten
                 // card 1 (Matang)
                 // card 1 (Matang)
-                Center(
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    height: 120,
-                    padding: const EdgeInsets.all(20),
-                    margin: const EdgeInsets.symmetric(vertical: 3),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 1),
-                              decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(
-                                    0.2), // Latar belakang hijau muda
-                                border: Border.all(
-                                    color: Colors.red,
-                                    width: 2), // Border hijau
-                                borderRadius: BorderRadius.circular(
-                                    5), // Sudut border melengkung
-                              ),
-                              child: const Text(
-                                'Matang',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black, // Warna teks
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            const Text(
-                              '0,020 Kg',
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Image.asset(
-                          'assets/images/tomato.png',
-                          width: 90,
-                          height: 90,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                // card 2 (Belum Matang)
-                // card 2 (Belum Matang)
-                Center(
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    height: 120,
-                    padding: const EdgeInsets.all(20),
-                    margin: const EdgeInsets.symmetric(vertical: 1),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 1),
-                              decoration: BoxDecoration(
-                                color: Colors.orange.withOpacity(
-                                    0.2), // Latar belakang kuning muda
-                                border: Border.all(
-                                    color: Colors.orange,
-                                    width: 2), // Border kuning
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: const Text(
-                                'Setengah Matang',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black, // Warna teks
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            const Text(
-                              '0,020 Kg',
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Image.asset(
-                          'assets/images/setengahmatang.png',
-                          width: 90,
-                          height: 90,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
 
-                Center(
-                  child: Column(
-                    children: [
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        height: 120,
-                        padding: const EdgeInsets.all(20),
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 3), // Adjusted margin for spacing
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 1),
-                                  decoration: BoxDecoration(
-                                    color: Colors.green.withOpacity(
-                                        0.2), // Light yellow background
-                                    border: Border.all(
-                                      color: Colors.green,
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: const Text(
-                                    'Mentah',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black, // Text color
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 5),
-                                const Text(
-                                  '0,020 Kg',
-                                  style: TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Image.asset(
-                              'assets/images/tomato_Belummatang.png',
-                              width: 90,
-                              height: 90,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                          height: 5), // Space between container and button
-                      Container(
-                        width: MediaQuery.of(context).size.width *
-                            0.9, // Same width as above container
-                        height: 40,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Add your reset button action here
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red, // Button color
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  10), // Rounded button corners
-                            ),
-                            elevation: 5, // Shadow to make the button stand out
+                StreamBuilder<Map<String, dynamic>>(
+                  stream: berat_realtime, // Stream untuk berat
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text("Error: ${snapshot.error}"));
+                    } else if (snapshot.hasData) {
+                      var data = snapshot.data!['data'] ?? {};
+
+                      var firstDateKey =
+                          data.keys.isNotEmpty ? data.keys.first : null;
+                      if (firstDateKey == null) {
+                        return Center(child: Text("No data available."));
+                      }
+
+                      var kloterData = data[firstDateKey]?['kloter'] ?? {};
+
+                      var kategoriBerat = {
+                        "Matang": 0.0,
+                        "Setengah Matang": 0.0,
+                        "Mentah": 0.0,
+                      };
+
+                      kloterData.forEach((_, kloter) {
+                        var kategori = kloter['kategori'] ?? {};
+                        kategori.forEach((key, value) {
+                          if (kategoriBerat.containsKey(key)) {
+                            kategoriBerat[key] =
+                                (kategoriBerat[key]! + (value ?? 0.0));
+                          }
+                        });
+                      });
+
+                      var beratMatang_realtime =
+                          kategoriBerat["Matang"]!.toStringAsFixed(3);
+                      var beratSetengahMatang_realltime =
+                          kategoriBerat["Setengah Matang"]!.toStringAsFixed(3);
+                      var beratMentah_realtime =
+                          kategoriBerat["Mentah"]!.toStringAsFixed(3);
+
+                      return Column(
+                        children: [
+                          buildCard(
+                            context,
+                            title: "Matang",
+                            weight: beratMatang_realtime,
+                            imagePath: 'assets/images/tomato.png',
+                            color: Colors.red,
                           ),
-                          child: const Text(
-                            'Reset',
-                            style: TextStyle(
-                              fontSize: 18, // Larger text size
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white, // White text for contrast
+                          buildCard(
+                            context,
+                            title: "Setengah Matang",
+                            weight: beratSetengahMatang_realltime,
+                            imagePath: 'assets/images/setengahmatang.png',
+                            color: Colors.orange,
+                          ),
+                          buildCard(
+                            context,
+                            title: "Mentah",
+                            weight: beratMentah_realtime,
+                            imagePath: 'assets/images/tomato_Belummatang.png',
+                            color: Colors.green,
+                          ),
+                          const SizedBox(height: 10),
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.9,
+                            height: 40,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                _resetKloter(context); // Fungsi Reset
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                elevation: 5,
+                              ),
+                              child: const Text(
+                                'Reset',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
+                        ],
+                      );
+                    }
+
+                    return Center(child: Text("No data available."));
+                  },
                 ),
 
                 Padding(
@@ -693,6 +642,65 @@ class _berandaState extends State<beranda> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildCard(BuildContext context,
+      {required String title,
+      required String weight,
+      required String imagePath,
+      required Color color}) {
+    return Center(
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: 120,
+        padding: const EdgeInsets.all(20),
+        margin: const EdgeInsets.symmetric(vertical: 3),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.2),
+                    border: Border.all(color: color, width: 2),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  '$weight gr',
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            Image.asset(
+              imagePath,
+              width: 90,
+              height: 90,
+            ),
+          ],
         ),
       ),
     );

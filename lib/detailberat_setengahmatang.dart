@@ -87,7 +87,7 @@ class _DetailBeratSetengahMatangScreenState extends State<DetailBeratSetengahMat
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Icon(
-                      Icons.confirmation_number,
+                      Icons.calendar_month,
                       color: Colors.red,
                     ),
                     const SizedBox(width: 8),
@@ -179,14 +179,14 @@ class _DetailBeratSetengahMatangScreenState extends State<DetailBeratSetengahMat
                               ),
                             ),
                             Text(
-                              'Berat Tomat: ${_riwayatData != null && _riwayatData!['Setengah Matang'] != null ? (_riwayatData!['Setengah Matang']['total_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : '0.000'}',
+                              'Berat Tomat: ${_riwayatData != null && _riwayatData!['Setengah Matang'] != null ? (_riwayatData!['Setengah Matang']['total_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : '0.000'} gr',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.normal,
                               ),
                             ),
                             Text(
-                              'Rata Rata Berat: ${_riwayatData != null && _riwayatData!['Setengah Matang'] != null ? (_riwayatData!['Setengah Matang']['rata_rata_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : '0.000'}',
+                              'Rata Rata Berat: ${_riwayatData != null && _riwayatData!['Setengah Matang'] != null ? (_riwayatData!['Setengah Matang']['rata_rata_berat']?.toDouble() ?? 0.0).toStringAsFixed(3) : '0.000'} gr',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.normal,
@@ -221,7 +221,7 @@ class _DetailBeratSetengahMatangScreenState extends State<DetailBeratSetengahMat
                     ),
                   ),
                   Text(
-                    'Berat (Kg)',
+                    'Berat (gr)',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -259,7 +259,7 @@ class _DetailBeratSetengahMatangScreenState extends State<DetailBeratSetengahMat
                           ),
                         ),
                         Text(
-                          '${(tomato['berat_tomat'] ?? 0.0).toStringAsFixed(3)} Kg',
+                          '${(tomato['berat_tomat'] ?? 0.0).toStringAsFixed(3)} gr',
                           style: const TextStyle(fontSize: 16),
                         ),
                       ],
